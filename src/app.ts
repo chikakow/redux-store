@@ -7,9 +7,11 @@ const button = document.querySelector('button') as HTMLButtonElement;
 const destroy = document.querySelector('.unsubscribe') as HTMLButtonElement;
 const todoList = document.querySelector('.todos') as HTMLLIElement;
 
+
 const reducers = {
   todos: fromStore.reducer
 };
+
 const store = new fromStore.Store(reducers);
 
 button.addEventListener(
@@ -21,17 +23,28 @@ button.addEventListener(
 
     store.dispatch(new fromStore.AddToDo(payload));
 
-    renderTodos(store.value.todos.data)
+    // renderTodos(store.value.todos.data)
     
-
     input.value = '';
   },
   false
 );
 
+const unsubscribe = store.subscribe(state => {
+  renderTodos(state.todos.data);
+});
+
+destroy.addEventListener('click', unsubscribe, false);
+
 todoList.addEventListener('click', function(event) {
   const target = event.target as HTMLButtonElement;
   if (target.nodeName.toLowerCase() === 'button') {
-    console.log(target);
+    const todo = JSON.parse(target.getAttribute('data-todo') as any);
+    store.dispatch(new fromStore.RemoveToDo(todo));
+    console.log(store.value);
   }
 });
+
+store.subscribe(state => console.log(state));
+
+
